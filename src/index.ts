@@ -1,39 +1,45 @@
-addEventListener("fetch", (event) => {
-  event.respondWith(handleRequest(event.request));
-});
-
 const SERVICES = [
   "https://binimaya-backend-latest.onrender.com/api/health",
-  "https://manga-spot-backend.onrender.com/api",
+  "https://another-service.onrender.com/api/health",
 ];
 
-async function handleRequest(request: Request): Promise<Response> {
-  const results: Record<
-    string,
-    { status: string; data?: any; error?: string }
-  > = {};
+interface Env {}
+
+async function pingServices() {
+  const results: Record<string, any> = {};
 
   await Promise.all(
     SERVICES.map(async (url) => {
       try {
         const res = await fetch(url);
-        const contentType = res.headers.get("content-type") || "";
+        const contentType = res.headers.get("content-type");
 
-        if (contentType.includes("application/json")) {
+        if (contentType?.includes("application/json")) {
           const data = await res.json();
           results[url] = { status: "up", data };
         } else {
-          results[url] = { status: "up" };
+          results[url] = { status: "up", message: "Non-JSON response" };
         }
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        results[url] = { status: "down", error: message };
+      } catch (err: any) {
+        results[url] = { status: "down", error: err.message };
       }
     })
   );
 
-  return new Response(JSON.stringify(results, null, 2), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+  return results;
 }
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const results = await pingServices();
+    return new Response(JSON.stringify(results), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+
+  async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext) {
+    await pingServices();
+    console.log("Cron job executed at", new Date().toISOString());
+  },
+};
