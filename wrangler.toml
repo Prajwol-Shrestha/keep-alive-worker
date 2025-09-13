@@ -1,0 +1,6 @@
+name = "keep-alive-worker"
+main = "src/index.ts"
+compatibility_date = "2025-09-13"
+
+[triggers]
+crons = ["*/15 * * * *"]
