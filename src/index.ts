@@ -1,6 +1,7 @@
 const SERVICES = [
   "https://binimaya-backend-latest.onrender.com/api/health",
-  "https://another-service.onrender.com/api/health",
+  "https://manga-spot-backend.onrender.com/api",
+  "https://n8n-latest-3z96.onrender.com"
 ];
 
 interface Env {}
