@@ -1,6 +1,7 @@
 const SERVICES = [
   "https://binimaya-backend-latest.onrender.com/api/health",
   "https://manga-spot-backend.onrender.com/api",
+  "https://total-sheeree-prajwol-1c2ce6eb.koyeb.app/"
 ];
 
 interface Env {}
